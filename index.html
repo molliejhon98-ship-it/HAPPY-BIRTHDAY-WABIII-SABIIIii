@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>For Ferroza 🌸</title>
+
+<style>
+  :root{
+    --bg:#ffe4ef;
+    --card-bg: rgba(255,255,255,0.40);
+    --accent:#ff7db8;
+    --text:#5b0042;
+  }
+
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:"Poppins", system-ui, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow:hidden;
+  }
+
+  /* Landing */
+  .landing{
+    position:fixed;inset:0;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    cursor:pointer;
+    background:linear-gradient(135deg,#ffb6d5 0%, #ffcee5 80%);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .landing .title{
+    font-size:clamp(26px,4vw,48px);
+    font-weight:600;
+  }
+  .landing .hint{opacity:.9;font-size:14px}
+
+  /* Modal */
+  .modal-backdrop{
+    position:fixed;inset:0;
+    background:rgba(255,182,215,0.40);
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter: blur(8px);
+    z-index:20;
+  }
+  .modal{
+    background:rgba(255,255,255,0.55);
+    padding:30px;
+    border-radius:14px;
+    min-width:280px;
+    max-width:90vw;
+    text-align:center;
+    border:2px solid #ffc6dd;
+  }
+  .btn{
+    padding:10px 18px;
+    border-radius:10px;
+    border:0;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn.yes{background:var(--accent);color:white}
+  .btn.no{
+    background:white;color:var(--text);
+    border:2px solid #ffa3c4;
+  }
+
+  /* Birthday page */
+  .bday{
+    position:fixed;inset:0;
+    display:none;
+    overflow:auto;
+    background:linear-gradient(180deg,#ffd8eb 0%, #ffedfa 70%);
+  }
+  
+  /* --- FIX: Blooming flower container and animation trigger --- */
+  #bloomingFlowerContainer{
+    position:fixed;inset:0;
+    display:none; /* Start hidden, show with JS */
+    align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#ffb6d5 0%, #ffcee5 80%); 
+    opacity:0; 
+    z-index:100;
+    pointer-events:none;
+    transition:opacity 0.6s ease; 
+  }
+
+  /* FIX: The actual blooming flower styles */
+  .blooming-flower{
+    position:relative;
+    width:200px; 
+    height:200px;
+    /* Removed redundant flex layout from here */
+    transform:scale(0.2); 
+    opacity:0;
+    filter:drop-shadow(0 0 15px rgba(255,100,150,0.5));
+    animation: flowerGrowAndFade 3s ease-out forwards; 
+  }
+
+  .blooming-flower .petal{
+    position:absolute;
+    width:80px; 
+    height:140px; 
+    background:radial-gradient(circle at 50% 10%, #fff 0%, #ffe7f2 35%, #ffb3d7 70%, #ff8fc6 100%);
+    border-radius:50% 50% 30% 30%; 
+    transform-origin:center 120%; 
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    margin-left: -40px; /* Half petal width */
+    margin-top: -70px; /* Half petal height */
+    opacity:0;
+  }
+
+  /* Specific petal rotations and animation delays to form the flower */
+  .blooming-flower .petal:nth-child(1){ transform:rotate(0deg); animation: petalBloom 2s ease-out 0.2s forwards; --initial-rotation: 0deg; }
+  .blooming-flower .petal:nth-child(2){ transform:rotate(60deg); animation: petalBloom 2s ease-out 0.4s forwards; --initial-rotation: 60deg; }
+  .blooming-flower .petal:nth-child(3){ transform:rotate(120deg); animation: petalBloom 2s ease-out 0.6s forwards; --initial-rotation: 120deg; }
+  .blooming-flower .petal:nth-child(4){ transform:rotate(180deg); animation: petalBloom 2s ease-out 0.8s forwards; --initial-rotation: 180deg; }
+  .blooming-flower .petal:nth-child(5){ transform:rotate(240deg); animation: petalBloom 2s ease-out 1.0s forwards; --initial-rotation: 240deg; }
+  .blooming-flower .petal:nth-child(6){ transform:rotate(300deg); animation: petalBloom 2s ease-out 1.2s forwards; --initial-rotation: 300deg; }
+
+  /* FIX: Centering the yellow center perfectly */
+  .blooming-flower .center{
+    position:absolute;
+    width:45px;height:45px;
+    background:radial-gradient(circle, #ffeb3b 0%, #fbc02d 100%);
+    border-radius:50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0); /* Perfect centering AND initial scale 0 */
+    opacity:0;
+    animation: centerAppear 0.8s ease-out 1.5s forwards; 
+  }
+
+  /* Keyframes for the overall flower container */
+  @keyframes flowerGrowAndFade {
+    0% { transform: scale(0.2); opacity: 0; }
+    20% { opacity: 1; transform: scale(0.7); }
+    80% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  /* Keyframes for individual petals */
+  @keyframes petalBloom {
+    0% { opacity: 0; transform: scale(0.1) rotate(var(--initial-rotation)); }
+    50% { opacity: 1; transform: scale(1.1) rotate(var(--initial-rotation)); } 
+    100% { opacity: 1; transform: scale(1) rotate(var(--initial-rotation)); }
+  }
+
+  /* Keyframes for the flower center */
+  @keyframes centerAppear {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  /* --- END FIXES --- */
+
+
+  /* LOTS of floating flowers (no change) */
+  .flower-field{
+    position:absolute;inset:0;
+    overflow:hidden;
+    z-index:0;
+    pointer-events:none;
+  }
+  .flower{
+    position:absolute;
+    bottom:-10%;
+    width:45px;height:45px;
+    border-radius:50%;
+    background:
+      radial-gradient(circle,#fff 0%, #ffe7f2 35%, #ffb3d7 60%, #ff8fc6 100%);
+    animation: rise 14s linear infinite, spin 6s linear infinite;
+    opacity:0.9;
+    filter:drop-shadow(0 6px 10px rgba(255,100,150,0.4));
+  }
+  .flower.s1{width:30px;height:30px}
+  .flower.s3{width:60px;height:60px}
+
+  @keyframes rise{
+    0%{transform:translateY(0) rotate(0deg)}
+    100%{transform:translateY(-140vh) rotate(360deg)}
+  }
+  @keyframes spin{
+    0%{filter:hue-rotate(0deg)}
+    50%{filter:hue-rotate(30deg)}
+    100%{filter:hue-rotate(0deg)}
+  }
+
+  /* Birthday card (no change) */
+  .card{
+    position:relative;
+    z-index:5;
+    max-width:900px;
+    margin:6vh auto;
+    padding:40px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.55);
+    border:2px solid #ffc1da;
+    backdrop-filter: blur(8px);
+    transition:opacity .6s ease;
+  }
+  .card h1{
+    margin-top:0;
+    font-size:34px;
+    color:#b4006f;
+  }
+
+  .poem{
+    margin-top:20px;
+    font-size:18px;
+    white-space:pre-wrap;
+    line-height:1.6;
+  }
+
+  /* Photo collage (no change) */
+  .collage{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin:25px 0 10px 0;
+    flex-wrap:wrap;
+  }
+  .photo{
+    width:240px;height:240px;
+    background:#fff;
+    border-radius:14px;
+    overflow:hidden;
+    border:4px solid #ff9cc5;
+    box-shadow:0 8px 15px rgba(255,100,150,0.3);
+  }
+  .photo img{
+    width:100%;height:100%;
+    object-fit:cover;
+  }
+</style>
+</head>
+
+<body>
+
+<section class="landing" id="landing" title="Click anywhere">
+  <div class="title">Click Anywhere</div>
+  <div class="hint">something magical will happen…</div>
+</section>
+
+<div id="modalWrap" style="display:none">
+  <div class="modal-backdrop" id="backdrop">
+    <div class="modal">
+      <h2>Are you Ferroza?</h2>
+      <div style="opacity:.9;font-size:14px;margin-bottom:10px">This is meant only for you 🌸</div>
+      <div style="display:flex;gap:12px;justify-content:center; **align-items: center;**">
+        <button class="btn yes" id="yesBtn">Yes</button>
+        <button class="btn no" id="noBtn">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bloomingFlowerContainer">
+  <div class="blooming-flower" id="bloomingFlower">
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="center"></div>
+  </div>
+</div>
+<section class="bday" id="bday">
+  <div class="flower-field" id="flowerField"></div>
+
+  <div class="card" id="messageCard">
+
+    <h1>Happy Birthday, Ferroza 🌸</h1>
+
+    <div class="collage">
+      <div class="photo"><img src="f1.jpg"></div>
+      <div class="photo"><img src="f2.jpg"></div>
+      <div class="photo"><img src="f3.jpg"></div>
+    </div>
+
+<div class="poem">
+
+Dearest Wabbi Fer-Fer,
+
+Today the sky leans in like a friend with secret petals,
+and the sun arranges itself as though it learned your favorite color.
+Each hour drifts like a soft petal on a slow river; gentle, deliberate,
+carrying with it a chorus of small, kind things:
+the memory of your laughter, the quiet courage of your mornings,
+the way your eyes gather light and turn it into hope.
+
+May this year find you wrapped in afternoons that feel like warm tea,
+and nights that hum with simple triumphs.
+May the doors that have only whispered your name open wide and bright,
+and may you walk through them with the same grace you lend to others.
+
+If wishes could be woven into necklaces, consider this one strung:
+the steady courage to chase what's wild in your heart,
+the wisdom to rest when the roads grow heavy,
+and a harvest of joy, piece by slow piece, like honey settling in the jar.
+
+Bloom, Dear wabii, not despite the storms, but because of them.
+Let each small worry be fertilizer for your brightest living.
+And when the world seems large and hurried, remember: you are the quiet miracle
+that stops it just long enough to breathe.
+
+Happy birthday. Be bold, be gentle, be entirely, luminously you.
+With all warm wishes and a pocketful of flowers,
+ - from someone who believes in your bloom.
+
+Always remember: WABI SABI.
+</div>
+
+  </div>
+</section>
+
+<script>
+const landing = document.getElementById("landing");
+const modalWrap = document.getElementById("modalWrap");
+const backdrop = document.getElementById("backdrop");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const bday = document.getElementById("bday");
+const flowerField = document.getElementById("flowerField");
+const bloomingFlowerContainer = document.getElementById("bloomingFlowerContainer");
+const bloomingFlower = document.getElementById("bloomingFlower");
+
+landing.addEventListener("click", openQuestion);
+
+function openQuestion(){
+  modalWrap.style.display="block";
+  setTimeout(()=> backdrop.addEventListener("click", outsideClickAsYes), 20);
+}
+function outsideClickAsYes(e){
+  if(e.target===backdrop) acceptYes();
+}
+yesBtn.addEventListener("click", acceptYes);
+
+function acceptYes(){
+  modalWrap.style.display="none";
+  landing.style.opacity=0;
+  landing.style.transform="scale(.97)";
+  
+  // FIX: Force display:flex to ensure it's visible and animations start
+  bloomingFlowerContainer.style.display = "flex";
+  bloomingFlowerContainer.style.opacity = 1;
+  bloomingFlowerContainer.style.pointerEvents = "auto";
+  
+  // After flowerGrowAndFade animation completes (3 seconds)
+  setTimeout(()=>{
+    // Fade out the blooming flower container
+    bloomingFlowerContainer.style.opacity = 0;
+    
+    setTimeout(() => {
+      // After fade out (0.6s), hide it and show the birthday content
+      bloomingFlowerContainer.style.display = "none";
+      showBirthday();
+    }, 600); 
+    
+  }, 2800); 
+}
+noBtn.addEventListener("click", ()=> modalWrap.style.display="none");
+
+function showBirthday(){
+  bday.style.display="block";
+  bday.style.opacity=0;
+  bday.style.transition="opacity .6s ease";
+  requestAnimationFrame(()=> bday.style.opacity=1);
+
+  // LOTS of flowers
+  for(let i=0;i<40;i++){
+    const f=document.createElement("div");
+    f.classList.add("flower");
+    f.classList.add(["s1","s2","s3"][Math.floor(Math.random()*3)]);
+    f.style.left=Math.random()*100+"vw";
+    f.style.animationDelay=(Math.random()*-14)+"s";
+    flowerField.appendChild(f);
+  }
+}
+</script>
+
+</body>
+</html>
