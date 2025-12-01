@@ -74,10 +74,10 @@
     background:linear-gradient(180deg,#ffd8eb 0%, #ffedfa 70%);
   }
   
-  /* --- FIX: Blooming flower container and animation trigger --- */
+  /* Container for the blooming animation */
   #bloomingFlowerContainer{
     position:fixed;inset:0;
-    display:none; /* Start hidden, show with JS */
+    display:none;
     align-items:center;justify-content:center;
     background:linear-gradient(135deg,#ffb6d5 0%, #ffcee5 80%); 
     opacity:0; 
@@ -86,33 +86,40 @@
     transition:opacity 0.6s ease; 
   }
 
-  /* FIX: The actual blooming flower styles */
+  /* The Flower Wrapper */
   .blooming-flower{
     position:relative;
     width:200px; 
     height:200px;
-    /* Removed redundant flex layout from here */
     transform:scale(0.2); 
     opacity:0;
     filter:drop-shadow(0 0 15px rgba(255,100,150,0.5));
     animation: flowerGrowAndFade 3s ease-out forwards; 
   }
 
+  /* --- FIX: Petal Alignment --- */
   .blooming-flower .petal{
     position:absolute;
     width:80px; 
     height:140px; 
     background:radial-gradient(circle at 50% 10%, #fff 0%, #ffe7f2 35%, #ffb3d7 70%, #ff8fc6 100%);
     border-radius:50% 50% 30% 30%; 
-    transform-origin:center 120%; 
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    margin-left: -40px; /* Half petal width */
-    margin-top: -70px; /* Half petal height */
+    
+    /* Center Placement Logic */
+    top: 50%;
+    left: 50%;
+    margin-left: -40px; /* Half of width (80px) to center horizontally */
+    
+    /* Key Change: Move up by full height so the BOTTOM touches the center point */
+    margin-top: -140px; 
+    
+    /* Key Change: Rotate around the bottom center of the petal */
+    transform-origin: center bottom;
+    
     opacity:0;
+    z-index: 1; /* Below the center */
   }
 
-  /* Specific petal rotations and animation delays to form the flower */
   .blooming-flower .petal:nth-child(1){ transform:rotate(0deg); animation: petalBloom 2s ease-out 0.2s forwards; --initial-rotation: 0deg; }
   .blooming-flower .petal:nth-child(2){ transform:rotate(60deg); animation: petalBloom 2s ease-out 0.4s forwards; --initial-rotation: 60deg; }
   .blooming-flower .petal:nth-child(3){ transform:rotate(120deg); animation: petalBloom 2s ease-out 0.6s forwards; --initial-rotation: 120deg; }
@@ -120,20 +127,23 @@
   .blooming-flower .petal:nth-child(5){ transform:rotate(240deg); animation: petalBloom 2s ease-out 1.0s forwards; --initial-rotation: 240deg; }
   .blooming-flower .petal:nth-child(6){ transform:rotate(300deg); animation: petalBloom 2s ease-out 1.2s forwards; --initial-rotation: 300deg; }
 
-  /* FIX: Centering the yellow center perfectly */
+  /* --- FIX: The Center --- */
   .blooming-flower .center{
     position:absolute;
     width:45px;height:45px;
     background:radial-gradient(circle, #ffeb3b 0%, #fbc02d 100%);
     border-radius:50%;
+    
+    /* Perfectly centered in the 200x200 container */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0); /* Perfect centering AND initial scale 0 */
+    transform: translate(-50%, -50%) scale(0);
+    
     opacity:0;
+    z-index: 2; /* On top of petals */
     animation: centerAppear 0.8s ease-out 1.5s forwards; 
   }
 
-  /* Keyframes for the overall flower container */
   @keyframes flowerGrowAndFade {
     0% { transform: scale(0.2); opacity: 0; }
     20% { opacity: 1; transform: scale(0.7); }
@@ -141,22 +151,19 @@
     100% { transform: scale(1); opacity: 0; }
   }
 
-  /* Keyframes for individual petals */
   @keyframes petalBloom {
     0% { opacity: 0; transform: scale(0.1) rotate(var(--initial-rotation)); }
     50% { opacity: 1; transform: scale(1.1) rotate(var(--initial-rotation)); } 
     100% { opacity: 1; transform: scale(1) rotate(var(--initial-rotation)); }
   }
 
-  /* Keyframes for the flower center */
   @keyframes centerAppear {
     0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
-  /* --- END FIXES --- */
 
 
-  /* LOTS of floating flowers (no change) */
+  /* Floating flowers (background) */
   .flower-field{
     position:absolute;inset:0;
     overflow:hidden;
@@ -187,7 +194,7 @@
     100%{filter:hue-rotate(0deg)}
   }
 
-  /* Birthday card (no change) */
+  /* Birthday card */
   .card{
     position:relative;
     z-index:5;
@@ -213,7 +220,7 @@
     line-height:1.6;
   }
 
-  /* Photo collage (no change) */
+  /* Photo collage */
   .collage{
     display:flex;
     justify-content:center;
@@ -248,7 +255,7 @@
     <div class="modal">
       <h2>Are you Ferroza?</h2>
       <div style="opacity:.9;font-size:14px;margin-bottom:10px">This is meant only for you 🌸</div>
-      <div style="display:flex;gap:12px;justify-content:center; **align-items: center;**">
+      <div style="display:flex;gap:12px;justify-content:center; align-items: center;">
         <button class="btn yes" id="yesBtn">Yes</button>
         <button class="btn no" id="noBtn">No</button>
       </div>
@@ -267,6 +274,7 @@
     <div class="center"></div>
   </div>
 </div>
+
 <section class="bday" id="bday">
   <div class="flower-field" id="flowerField"></div>
 
@@ -275,13 +283,12 @@
     <h1>Happy Birthday, Ferroza 🌸</h1>
 
     <div class="collage">
-      <div class="photo"><img src="f1.jpg"></div>
-      <div class="photo"><img src="f2.jpg"></div>
-      <div class="photo"><img src="f3.jpg"></div>
+      <div class="photo"><img src="f1.jpg" alt="Photo 1"></div>
+      <div class="photo"><img src="f2.jpg" alt="Photo 2"></div>
+      <div class="photo"><img src="f3.jpg" alt="Photo 3"></div>
     </div>
 
 <div class="poem">
-
 Dearest Wabbi Fer-Fer,
 
 Today the sky leans in like a friend with secret petals,
@@ -311,6 +318,7 @@ With all warm wishes and a pocketful of flowers,
  - from someone who believes in your bloom.
 
 Always remember: WABI SABI.
+<a href="https://www.youtube.com/shorts/AN4a-38j8I4" target="_blank" style="color:#b4006f; font-weight:bold;">https://www.youtube.com/shorts/AN4a-38j8I4</a>
 </div>
 
   </div>
@@ -342,19 +350,19 @@ function acceptYes(){
   modalWrap.style.display="none";
   landing.style.opacity=0;
   landing.style.transform="scale(.97)";
-  
-  // FIX: Force display:flex to ensure it's visible and animations start
+   
+  // Force display:flex so animation runs
   bloomingFlowerContainer.style.display = "flex";
   bloomingFlowerContainer.style.opacity = 1;
   bloomingFlowerContainer.style.pointerEvents = "auto";
-  
-  // After flowerGrowAndFade animation completes (3 seconds)
+   
+  // Total duration of flowerGrowAndFade is 3s
   setTimeout(()=>{
-    // Fade out the blooming flower container
+    // Begin fade out of the flower container
     bloomingFlowerContainer.style.opacity = 0;
     
     setTimeout(() => {
-      // After fade out (0.6s), hide it and show the birthday content
+      // After transition ends, hide it and show main content
       bloomingFlowerContainer.style.display = "none";
       showBirthday();
     }, 600); 
@@ -369,7 +377,7 @@ function showBirthday(){
   bday.style.transition="opacity .6s ease";
   requestAnimationFrame(()=> bday.style.opacity=1);
 
-  // LOTS of flowers
+  // Floating background flowers
   for(let i=0;i<40;i++){
     const f=document.createElement("div");
     f.classList.add("flower");
