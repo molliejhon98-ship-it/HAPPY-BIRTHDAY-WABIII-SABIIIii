@@ -97,27 +97,19 @@
     animation: flowerGrowAndFade 3s ease-out forwards; 
   }
 
-  /* --- FIX: Petal Alignment --- */
   .blooming-flower .petal{
     position:absolute;
     width:80px; 
     height:140px; 
     background:radial-gradient(circle at 50% 10%, #fff 0%, #ffe7f2 35%, #ffb3d7 70%, #ff8fc6 100%);
     border-radius:50% 50% 30% 30%; 
-    
-    /* Center Placement Logic */
     top: 50%;
     left: 50%;
-    margin-left: -40px; /* Half of width (80px) to center horizontally */
-    
-    /* Key Change: Move up by full height so the BOTTOM touches the center point */
+    margin-left: -40px; 
     margin-top: -140px; 
-    
-    /* Key Change: Rotate around the bottom center of the petal */
     transform-origin: center bottom;
-    
     opacity:0;
-    z-index: 1; /* Below the center */
+    z-index: 1; 
   }
 
   .blooming-flower .petal:nth-child(1){ transform:rotate(0deg); animation: petalBloom 2s ease-out 0.2s forwards; --initial-rotation: 0deg; }
@@ -127,20 +119,16 @@
   .blooming-flower .petal:nth-child(5){ transform:rotate(240deg); animation: petalBloom 2s ease-out 1.0s forwards; --initial-rotation: 240deg; }
   .blooming-flower .petal:nth-child(6){ transform:rotate(300deg); animation: petalBloom 2s ease-out 1.2s forwards; --initial-rotation: 300deg; }
 
-  /* --- FIX: The Center --- */
   .blooming-flower .center{
     position:absolute;
     width:45px;height:45px;
     background:radial-gradient(circle, #ffeb3b 0%, #fbc02d 100%);
     border-radius:50%;
-    
-    /* Perfectly centered in the 200x200 container */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    
     opacity:0;
-    z-index: 2; /* On top of petals */
+    z-index: 2; 
     animation: centerAppear 0.8s ease-out 1.5s forwards; 
   }
 
@@ -161,7 +149,6 @@
     0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
-
 
   /* Floating flowers (background) */
   .flower-field{
@@ -244,6 +231,11 @@
 </head>
 
 <body>
+
+<audio id="bgMusic" loop>
+  <source src="PALAGI.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
 
 <section class="landing" id="landing" title="Click anywhere">
   <div class="title">Click Anywhere</div>
@@ -334,6 +326,7 @@ const bday = document.getElementById("bday");
 const flowerField = document.getElementById("flowerField");
 const bloomingFlowerContainer = document.getElementById("bloomingFlowerContainer");
 const bloomingFlower = document.getElementById("bloomingFlower");
+const bgMusic = document.getElementById("bgMusic"); // Select the audio
 
 landing.addEventListener("click", openQuestion);
 
@@ -350,6 +343,16 @@ function acceptYes(){
   modalWrap.style.display="none";
   landing.style.opacity=0;
   landing.style.transform="scale(.97)";
+
+  // HACK: Mobile browsers block audio unless it happens EXACTLY on click.
+  // We play it immediately (muted) to 'unlock' it, then pause it.
+  bgMusic.volume = 0.5; 
+  bgMusic.play().then(() => {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }).catch(error => {
+    console.log("Audio unlock failed, will try again later:", error);
+  });
    
   // Force display:flex so animation runs
   bloomingFlowerContainer.style.display = "flex";
@@ -375,6 +378,10 @@ function showBirthday(){
   bday.style.display="block";
   bday.style.opacity=0;
   bday.style.transition="opacity .6s ease";
+  
+  // PLAY MUSIC HERE
+  bgMusic.play().catch(e => console.log("Audio playback failed:", e));
+
   requestAnimationFrame(()=> bday.style.opacity=1);
 
   // Floating background flowers
